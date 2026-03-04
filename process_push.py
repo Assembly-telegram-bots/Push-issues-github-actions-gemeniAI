@@ -31,9 +31,17 @@ Commit Message: {commit.commit.message}
 Code Changes:
 {diff_text}
 
+Instructions:
+1. Create a clear issue title and body explaining the changes.
+2. Choose the most appropriate labels from: ["bug", "documentation", "duplicate", "enhancement", "good first issue", "help wanted", "invalid", "question", "wontfix"].
+3. SECURITY REVIEW: Carefully analyze the code changes for any potential security vulnerabilities (e.g., injection flaws, hardcoded secrets, XSS, insecure data handling).
+   - If you find a potential vulnerability, add a section "### Security Warning" at the end of the `issue_body` describing the risk and how to fix it.
+   - Also, if a vulnerability is found, add the label "security" to the `labels` list.
+
 Return only a raw JSON object with no markdown formatting. The JSON must contain these exact keys:
 "issue_title": string,
-"issue_body": string
+"issue_body": string,
+"labels": list of strings
 """
 
 model_name = "gemini-2.5-flash"
@@ -59,5 +67,6 @@ result = json.loads(response_text)
 
 repo.create_issue(
     title=result['issue_title'],
-    body=f"{result['issue_body']}\n\n---\n*Сгенерировано на основе коммита {commit_sha[:7]}*"
+    body=f"{result['issue_body']}\n\n---\n*Generated from commit {commit_sha[:7]}*",
+    labels=result.get('labels', [])
 )
